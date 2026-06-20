@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReChat | Play Together</title>
+    <style>
+        /* --- BRAND BLUE CORE DESIGN SYSTEM --- */
+        :root {
+            --rr-orange: #ff7b00;
+            --brand-blue: #2563eb;
+            --brand-blue-hover: #1d4ed8;
+            --bg-color: #0b132b;       /* Deep Navy Blue */
+            --card-bg: #1c2541;        /* Dark Slate Blue */
+            --text-main: #ffffff;
+            --text-muted: #65a1ff;     /* Muted Light Blue */
+            --nav-bg: #070c1e;         /* Midnight Blue Navigation */
+            --border-color: #3a506b;   /* Steel Blue Border */
+            --input-bg: #0b132b;
+            --accent-teal: #00f2fe;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-y: scroll;
+        }
+
+        /* Responsive Navigation Bar */
+        nav {
+            background-color: var(--nav-bg);
+            padding: 12px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav .brand-zone {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav .logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--rr-orange); /* 'Re' is Orange */
+            letter-spacing: -0.5px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        nav .logo span {
+            color: var(--brand-blue); /* 'Chat' is Blue */
+        }
+
+        nav .search-bar {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            width: 280px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        nav .search-bar:focus {
+            border-color: var(--brand-blue);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        nav ul li a:hover, nav ul li a.active-nav {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        nav ul li a.active-nav {
+            color: var(--brand-blue);
+        }
+
+        /* Core Structure Layout */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: recFade 0.2s ease-out;
+        }
+
+        @keyframes recFade {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dynamic Face-Less Blue-Teal Gradient Profiles */
+        .card-avatar, .profile-page-avatar {
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .card-avatar {
+            width: 42px;
+            height: 42px;
+        }
+
+        .profile-page-avatar {
+            width: 130px;
+            height: 130px;
+            border: 4px solid var(--card-bg);
+        }
+
+        /* Content Modular Grids */
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .photo-grid, .generic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        /* Card Engine Styles */
+        .photo-card, .item-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .photo-card:hover, .item-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--brand-blue);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            gap: 12px;
+        }
+
+        .card-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-display-name {
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .card-display-name:hover {
+            color: var(--brand-blue);
+        }
+
+        .card-username {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .photo-card img, .item-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            background-color: #0b132b;
+        }
+
+        .photo-info, .item-details {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .room-tag {
+            display: inline-block;
+            background: var(--input-bg);
+            color: var(--text-muted);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color 0.1s;
+        }
+
+        .action-item:hover {
+            color: #ffffff;
+        }
+
+        /* Shop Views */
+        .item-details h4 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .item-details p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+            height: 36px;
+            overflow: hidden;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .token-price {
+            color: #ffcc00;
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .shop-buy-btn {
+            background: var(--input-bg);
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .shop-buy-btn:hover {
+            background: var(--brand-blue);
+            border-color: var(--brand-blue);
+        }
+
+        /* Creator Hub Panel Layout */
+        .hub-banner {
+            background: linear-gradient(135deg, #0f172a, var(--card-bg));
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .hub-banner h2 { font-size: 32px; font-weight: 900; margin-bottom: 8px;}
+        .hub-banner p { color: var(--text-muted); font-size: 16px; margin-bottom: 20px;}
+        
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        @media(max-width: 800px) { .dashboard-row { grid-template-columns: 1fr; } }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .metric-box {
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .metric-box div:first-child { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;}
+        .metric-box div:last-child { font-size: 22px; font-weight: 800; color: var(--brand-blue); }
+
+        .code-input-zone {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .code-input-zone input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            flex-grow: 1;
+            outline: none;
+        }
+        .code-input-zone button {
+            background: var(--brand-blue);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Profile Layout */
+        .profile-banner {
+            height: 220px;
+            border-radius: 14px 14px 0 0;
+            background: linear-gradient(180deg, #1d4ed8, #0b132b);
+        }
+        .profile-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .profile-details-wrapper {
+            padding: 0 30px 30px 30px;
+            position: relative;
+        }
+        .profile-avatar-placement {
+            margin-top: -65px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        .p-level-tag {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: var(--brand-blue);
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 900;
+            border-radius: 10px;
+            border: 3px solid var(--card-bg);
+        }
+        .profile-identity h2 { font-size: 26px; font-weight: 900; }
+        .profile-identity p { color: var(--text-muted); margin-bottom: 12px; font-size: 15px;}
+        .profile-bio { font-size: 14px; max-width: 700px; line-height: 1.5; color: #cbd5e1; margin-bottom: 20px;}
+        .profile-stats-row span { margin-right: 25px; font-size: 14px; color: var(--text-muted); }
+        .profile-stats-row strong { color: white; font-weight: 700; }
+
+        /* Authorization Panels */
+        .form-container {
+            background: var(--card-bg);
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .form-container h2 { font-weight: 900; margin-bottom: 25px; font-size: 24px;}
+        .form-container input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+        .form-container input:focus { border-color: var(--brand-blue); }
+        .btn {
+            background: var(--brand-blue);
+            color: white;
+            font-weight: 700;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover { background: var(--brand-blue-hover); }
+        .form-hint { color: var(--text-muted); font-size: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand-zone">
+            <div class="logo" onclick="navigateTo('home')">Re<span>Chat</span></div>
+            <input type="text" class="search-bar" placeholder="Search rooms, creators, inventions...">
+        </div>
+        <ul id="nav-links">
+            </ul>
+    </nav>
+
+    <div class="container">
+
+        <div id="home" class="page active">
+            <h3 class="section-title">Community Photo Stream</h3>
+            <div class="photo-grid" id="feed-container"></div>
+        </div>
+
+        <div id="rooms" class="page">
+            <h3 class="section-title">Popular Rooms</h3>
+            <div class="photo-grid" id="rooms-container"></div>
+        </div>
+
+        <div id="shop" class="page">
+            <h3 class="section-title">Merchandise &amp; Token Shop</h3>
+            <div class="generic-grid" id="shop-container"></div>
+        </div>
+
+        <div id="creator-hub" class="page">
+            <div class="hub-banner">
+                <h2>Creator Resource Dashboard</h2>
+                <p>Build, share, publish, and earn tokens inside the unified design ecosystem.</p>
+            </div>
+            <div class="dashboard-row">
+                <div class="dashboard-card">
+                    <h4 style="font-weight:800; margin-bottom:15px;">Your Portfolio Operations</h4>
+                    <div class="metrics-grid">
+                        <div class="metric-box"><div>Room Visits</div><div>14,205</div></div>
+                        <div class="metric-box"><div>Invention Sales</div><div>382</div></div>
+                        <div class="metric-box"><div>Tokens Earned</div><div>42,500</div></div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h4 style="font-weight:800; margin-bottom:10px;">Support a Creator</h4>
+                    <p style="color:var(--text-muted); font-size:13px; line-height:1.4;">Input a custom creator handle to route matching asset ecosystem transactions directly to them.</p>
+                    <div class="code-input-zone">
+                        <input type="text" id="creator-code-box" placeholder="e.g. OtisdubYT">
+                        <button onclick="applyCreatorCode()">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <h3 class="section-title">Developer Guides &amp; Bootcamps</h3>
+            <div class="photo-grid" id="hub-guides-container"></div>
+        </div>
+
+        <div id="profile" class="page">
+            <div class="profile-card">
+                <div class="profile-banner" id="p-banner"></div>
+                <div class="profile-details-wrapper">
+                    <div class="profile-avatar-placement">
+                        <div class="profile-page-avatar" id="p-avatar"></div>
+                        <div class="p-level-tag" id="p-level">LVL --</div>
+                    </div>
+                    <div class="profile-identity">
+                        <h2 id="p-displayname">---</h2>
+                        <p id="p-username">@---</p>
+                    </div>
+                    <div class="profile-bio" id="p-bio">...</div>
+                    <div class="profile-stats-row">
+                        <span><strong id="p-stat-photos">0</strong> Captures</span>
+                        <span><strong id="p-stat-cheers">0</strong> Total Cheers</span>
+                    </div>
+                </div>
+            </div>
+            <h3 class="section-title" id="p-gallery-header">Gallery Portfolio</h3>
+            <div class="photo-grid" id="profile-photos-container"></div>
+        </div>
+
+        <div id="login" class="page">
+            <div class="form-container">
+                <h2>Log In to ReChat</h2>
+                <input type="text" id="login-username" placeholder="Username (Coach, OtisdubYT, etc)">
+                <input type="password" id="login-password" placeholder="Password">
+                <button class="btn" onclick="handleLogin()">Sign In</button>
+                <div class="form-hint">Universal authorization password: <b>rechatxyz123</b></div>
+            </div>
+        </div>
+
+        <div id="signup" class="page">
+            <div class="form-container">
+                <h2>Create Creator Account</h2>
+                <input type="text" id="signup-username" placeholder="Choose unique alias">
+                <input type="email" id="signup-email" placeholder="Email address alignment">
+                <input type="password" id="signup-password" placeholder="Password requirement">
+                <button class="btn" onclick="handleSignup()">Complete Enrollment</button>
+                <div class="form-hint">Account activation requirement password: <b>rechatxyz123</b></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SEAMLESS SYSTEM DATA WITH CHOSEN FACELESS BLUE-TEAL AVATARS ---
+        const creators = {
+            "Coach": {
+                name: "Coach", username: "Coach", level: 50, 
+                bio: "Welcome to ReChat! Dynamic system management account.", 
+                avatar: "linear-gradient(135deg, #0052d4, #4364f7, #6fb1fc)",
+                cheers: 99401, banner: "linear-gradient(135deg, #1d4ed8, #070c1e)"
+            },
+            "OtisdubYT": {
+                name: "Otisdub", username: "OtisdubYT", level: 42, 
+                bio: "Content Creator | Making cool look simple. Sub to the channel!", 
+                avatar: "linear-gradient(135deg, #0acffe, #495aff)",
+                cheers: 8251, banner: "linear-gradient(135deg, #1e3c72, #2a5298)"
+            },
+            "Lerainzer": {
+                name: "Lerainzer", username: "Lerainzer", level: 38, 
+                bio: "Quest speedrunner. Certified Golden Trophy champion archer.", 
+                avatar: "linear-gradient(135deg, #184e68, #57ca85)",
+                cheers: 4120, banner: "linear-gradient(135deg, #0b132b, #3a506b)"
+            },
+            "goodguy1080": {
+                name: "GoodGuy", username: "goodguy1080", level: 29, 
+                bio: "Just your friendly neighborhood league competitive paintball player.", 
+                avatar: "linear-gradient(135deg, #2af598, #009ae4)",
+                cheers: 1980, banner: "linear-gradient(135deg, #11998e, #1c2541)"
+            },
+            "Legshairyman": {
+                name: "Legshairyman", username: "Legshairyman", level: 50, 
+                bio: "Stunt Runner world record chaser. Can't outrun me.", 
+                avatar: "linear-gradient(135deg, #0575e6, #00f260)",
+                cheers: 9410, banner: "linear-gradient(135deg, #ed213a, #0b132b)"
+            },
+            "Chris101": {
+                name: "Chris", username: "Chris101", level: 31, 
+                bio: "Custom clubhouse designer and high-level circuit engineer.", 
+                avatar: "linear-gradient(135deg, #4facfe, #00f2fe)",
+                cheers: 1420, banner: "linear-gradient(135deg, #4e54c8, #8f94fb)"
+            },
+            "ziadlive": {
+                name: "Ziad", username: "ziadlive", level: 45, 
+                bio: "Live streaming my activities daily. Find me in custom lobbies!", 
+                avatar: "linear-gradient(135deg, #209cff, #68e0cf)",
+                cheers: 6310, banner: "linear-gradient(135deg, #fc4a1a, #0b132b)"
+            }
+        };
+
+        const globalPhotos = [
+            { id: 201, room: "^Paintball", author: "OtisdubYT", cheers: 240, date: "45m ago" },
+            { id: 202, room: "^Orientation", author: "Coach", cheers: 9140, date: "3h ago" },
+            { id: 203, room: "^GoldenTrophy", author: "Lerainzer", cheers: 315, date: "1d ago" },
+            { id: 204, room: "^CyberJunkCity", author: "goodguy1080", cheers: 112, date: "1d ago" },
+            { id: 205, room: "^StuntRunner", author: "Legshairyman", cheers: 684, date: "2d ago" },
+            { id: 206, room: "^JrecClubhouse", author: "Chris101", cheers: 74, date: "3d ago" },
+            { id: 207, room: "^Dodgeball", author: "ziadlive", cheers: 421, date: "4d ago" },
+            { id: 208, room: "^GoldenTrophy", author: "Coach", cheers: 4105, date: "5d ago" }
+        ];
+
+        const globalRooms = [
+            { name: "^Paintball", creator: "Coach", visits: "4.2M", desc: "Fast-paced sporting arena. Capture the flag or elimination combat." },
+            { name: "^GoldenTrophy", creator: "Coach", visits: "2.9M", desc: "Cooperative dungeon crawler. Clear out the goblin threat." },
+            { name: "^StuntRunner", creator: "Legshairyman", visits: "890K", desc: "High-octane agility course testing physical reaction speed." },
+            { name: "^CircuitLabs", creator: "Chris101", visits: "120K", desc: "A playground sandboxing logical microchips and wiring devices." },
+            { name: "^OtisHangout", creator: "OtisdubYT", visits: "410K", desc: "Community lounge designed for subscriber interactions." },
+            { name: "^LeraQuest", creator: "Lerainzer", visits: "95K", desc: "Custom challenge dungeon featuring specialized combat mechanics." }
+        ];
+
+        const shopItems = [
+            { title: "ReChat Plus Subscription", desc: "Monthly membership pack granting 1,500 tokens per week and special store discounts.", cost: "$7.99/mo", imgText: "RC+", isRealMoney: true },
+            { title: "35,000 Token Massive Bundle", desc: "Inject immense spending capital instantly into your custom catalog balance.", cost: "35,000", imgText: "Tokens Cash" },
+            { title: "Cyber Visor [Teal Variant]", desc: "Highly customizable accessory mapping glow values cleanly across dark configurations.", cost: "8,500", imgText: "Visor" },
+            { title: "Royal Crimson Cape", desc: "Extremely high fidelity back cosmetic flowing organically with animations.", cost: "12,000", imgText: "Cape" },
+            { title: "Retro Arcade Hoodie", desc: "Classic throwback wear styled uniquely with neon geometric layouts.", cost: "4,500", imgText: "Hoodie" },
+            { title: "10,000 Token Solid Cache", desc: "Premium medium spending wallet update.", cost: "10,000", imgText: "Tokens Cache" }
+        ];
+
+        const guideData = [
+            { title: "Circuits V2 Framework Setup", room: "Tutorials", author: "Chris101" },
+            { title: "Optimizing Custom Room Colliders", room: "Guides", author: "Coach" },
+            { title: "Advanced MakerPen Transform Inventions", room: "Design", author: "OtisdubYT" }
+        ];
+
+        let isLoggedIn = false;
+        let currentUser = "OtisdubYT";
+
+        // --- DEEP LINK DATA ROUTING AND VIEW ENGINE ---
+        function navigateTo(pageId, dynamicTarget = null) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('#nav-links a').forEach(link => link.classList.remove('active-nav'));
+            
+            const selectedPage = document.getElementById(pageId);
+            if(selectedPage) selectedPage.classList.add('active');
+
+            if (pageId === 'home') {
+                loadFeed();
+                highlightNav('nav-feed');
+            } else if (pageId === 'rooms') {
+                loadRooms();
+                highlightNav('nav-rooms');
+            } else if (pageId === 'shop') {
+                loadShop();
+                highlightNav('nav-shop');
+            } else if (pageId === 'creator-hub') {
+                loadHub();
+                highlightNav('nav-hub');
+            } else if (pageId === 'profile') {
+                renderProfilePage(dynamicTarget || currentUser);
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function highlightNav(navElementId) {
+            const el = document.getElementById(navElementId);
+            if (el) el.classList.add('active-nav');
+        }
+
+        function updateNavBar() {
+            const nav = document.getElementById('nav-links');
+            if (isLoggedIn) {
+                nav.innerHTML = `
+                    <li><a id="nav-feed" onclick="navigateTo('home')">Feed</a></li>
+                    <li><a id="nav-rooms" onclick="navigateTo('rooms')">Rooms</a></li>
+                    <li><a id="nav-shop" onclick="navigateTo('shop')">Shop</a></li>
+                    <li><a id="nav-hub" onclick="navigateTo('creator-hub')">Creator Hub</a></li>
+                    <li><a onclick="navigateTo('profile', '${currentUser}')">Profile</a></li>
+                    <li><a onclick="logout()">Log Out</a></li>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <li><a id="nav-feed" onclick="navigateTo('home')">Feed</a></li>
+                    <li><a id="nav-rooms" onclick="navigateTo('rooms')">Rooms</a></li>
+                    <li><a id="nav-shop" onclick="navigateTo('shop')">Shop</a></li>
+                    <li><a id="nav-hub" onclick="navigateTo('creator-hub')">Creator Hub</a></li>
+                    <li><a onclick="navigateTo('login')">Log In</a></li>
+                    <li><a onclick="navigateTo('signup')">Sign Up</a></li>
+                `;
+            }
+        }
+
+        // --- TIMELINE FEED INJECTION ---
+        function loadFeed() {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = '';
+
+            globalPhotos.forEach(photo => {
+                const creator = creators[photo.author] || creators["Coach"];
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-avatar" style="background: ${creator.avatar}" onclick="navigateTo('profile', '${photo.author}')"></div>
+                        <div class="card-user-info">
+                            <span class="card-display-name" onclick="navigateTo('profile', '${photo.author}')">${creator.name}</span>
+                            <span class="card-username">@${creator.username} • ${photo.date}</span>
+                        </div>
+                    </div>
+                    <img src="https://via.placeholder.com/600x400.png?text=${photo.room}" alt="Capture Element">
+                    <div class="photo-info">
+                        <span class="room-tag">${photo.room}</span>
+                        <div class="card-actions">
+                            <div class="action-item" onclick="incrementCheer(${photo.id}, this)">
+                                🧡 <span>${photo.cheers}</span> Cheers
+                            </div>
+                            <div class="action-item">💬 Comments</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- STORE SHOPS IMPLEMENTATION ---
+        function loadShop() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+
+            shopItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                const formattingSymbol = item.isRealMoney ? '' : '🪙 ';
+                card.innerHTML = `
+                    <img src="https://via.placeholder.com/400x300.png?text=${item.imgText}" alt="Store Offering">
+                    <div class="item-details">
+                        <h4>${item.title}</h4>
+                        <p>${item.desc}</p>
+                        <div class="price-row">
+                            <span class="token-price" style="${item.isRealMoney ? 'color: #38ef7d;' : ''}">${formattingSymbol}${item.cost}</span>
+                            <button class="shop-buy-btn" onclick="alert('Purchase confirmed via platform verification!')">Acquire</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- ROOM EXPLORATION LAYOUT CONTAINER ---
+        function loadRooms() {
+            const container = document.getElementById('rooms-container');
+            container.innerHTML = '';
+
+            globalRooms.forEach(room => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="https://via.placeholder.com/600x400.png?text=${room.name}" alt="Room Frame">
+                    <div class="photo-info">
+                        <h4 style="font-weight:800; font-size:17px; margin-bottom:2px;">${room.name}</h4>
+                        <p style="color: var(--text-muted); font-size:13px; margin-bottom:10px;">Created by @${room.creator}</p>
+                        <p style="font-size:14px; color:#cbd5e1; height:40px; overflow:hidden; margin-bottom:12px;">${room.desc}</p>
+                        <div class="card-actions" style="justify-content: space-between; border-top:1px solid var(--border-color); padding-top:10px;">
+                            <span>👁️ ${room.visits} Visits</span>
+                            <button class="shop-buy-btn" style="padding:4px 10px;" onclick="alert('Launching system link inside ${room.name}!')">Go to Room</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- CREATOR HUB MODULE RENDERING ---
+        function loadHub() {
+            const container = document.getElementById('hub-guides-container');
+            container.innerHTML = '';
+
+            guideData.forEach(guide => {
+                const creator = creators[guide.author] || creators["Coach"];
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-avatar" style="background: ${creator.avatar}"></div>
+                        <div class="card-user-info">
+                            <span class="card-display-name">${creator.name}</span>
+                            <span class="card-username">@${creator.username}</span>
+                        </div>
+                    </div>
+                    <img src="https://via.placeholder.com/600x400.png?text=${guide.room}" alt="Circuit Documentation">
+                    <div class="photo-info">
+                        <h4 style="font-weight:700; font-size:15px;">${guide.title}</h4>
+                        <span class="room-tag" style="margin-top:8px; margin-bottom:0;">View Guide</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- PROFILE INJECTION ENGINE ---
+        function renderProfilePage(username) {
+            const user = creators[username];
+            if (!user) return;
+
+            document.getElementById('p-avatar').style.background = user.avatar;
+            document.getElementById('p-level').innerText = `LVL ${user.level}`;
+            document.getElementById('p-displayname').innerText = user.name;
+            document.getElementById('p-username').innerText = `@${user.username}`;
+            document.getElementById('p-bio').innerText = user.bio;
+            document.getElementById('p-stat-cheers').innerText = user.cheers.toLocaleString();
+            document.getElementById('p-gallery-header').innerText = `${user.name}'s Captures`;
+
+            const profilePhotosContainer = document.getElementById('profile-photos-container');
+            profilePhotosContainer.innerHTML = '';
+
+            const userPhotos = globalPhotos.filter(p => p.author === username);
+            document.getElementById('p-stat-photos').innerText = userPhotos.length;
+
+            if(userPhotos.length === 0) {
+                profilePhotosContainer.innerHTML = `<p style="color: var(--text-muted); grid-column: 1/-1; padding: 20px 0;">This profile hasn't documented any active captures.</p>`;
+                return;
+            }
+
+            userPhotos.forEach(photo => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="https://via.placeholder.com/600x400.png?text=${photo.room}" alt="Snapshot">
+                    <div class="photo-info">
+                        <span class="room-tag">${photo.room}</span>
+                        <div class="card-actions">
+                            <div class="action-item" onclick="incrementCheer(${photo.id}, this)">
+                                🧡 <span>${photo.cheers}</span> Cheers
+                            </div>
+                        </div>
+                    </div>
+                `;
+                profilePhotosContainer.appendChild(card);
+            });
+        }
+
+        // --- PLATFORM INTERACTION INTERFACES ---
+        function incrementCheer(photoId, element) {
+            const photo = globalPhotos.find(p => p.id === photoId);
+            if (photo) {
+                photo.cheers++;
+                element.querySelector('span').innerText = photo.cheers;
+                
+                if (creators[photo.author]) {
+                    creators[photo.author].cheers++;
+                    const activeViewedUser = document.getElementById('p-username').innerText;
+                    if(activeViewedUser === `@${photo.author}`) {
+                        document.getElementById('p-stat-cheers').innerText = creators[photo.author].cheers.toLocaleString();
+                    }
+                }
+            }
+        }
+
+        function applyCreatorCode() {
+            const code = document.getElementById('creator-code-box').value.trim();
+            if(creators[code]) {
+                alert(`Creator code successfully registered! Support target set to: @${creators[code].username}`);
+            } else {
+                alert("Target reference not found. Try 'OtisdubYT' or 'Coach'.");
+            }
+        }
+
+        // --- AUTHENTICATION FLOW ---
+        function handleLogin() {
+            const userField = document.getElementById('login-username').value.trim();
+            const passwordField = document.getElementById('login-password').value;
+
+            if(!userField) { alert("Please complete username fields."); return; }
+
+            if(passwordField !== "rechatxyz123") {
+                alert("Access Denied: Please authorize matching profile using 'rechatxyz123'.");
+                return;
+            }
+
+            if(creators[userField]) {
+                currentUser = userField;
+            } else {
+                creators[userField] = {
+                    name: userField, username: userField, level: 1,
+                    bio: "New ecosystem explorer.", avatar: "linear-gradient(135deg, #2b6777, #4cacbc)",
+                    cheers: 0, banner: "linear-gradient(135deg, #242526, #111215)"
+                };
+                currentUser = userField;
+            }
+
+            isLoggedIn = true;
+            updateNavBar();
+            navigateTo('profile', currentUser);
+        }
+
+        function handleSignup() {
+            const userField = document.getElementById('signup-username').value.trim();
+            const passwordField = document.getElementById('signup-password').value;
+
+            if(!userField) { alert("Please enter a valid credential name."); return; }
+
+            if(passwordField !== "rechatxyz123") {
+                alert("Security Requirement: Initialize your account setting using 'rechatxyz123'.");
+                return;
+            }
+
+            creators[userField] = {
+                name: userField, username: userField, level: 1,
+                bio: "Newly initialized portfolio interface alignment.", avatar: "linear-gradient(135deg, #1f4068, #162447)",
+                cheers: 0, banner: "linear-gradient(135deg, #242526, #111215)"
+            };
+            currentUser = userField;
+
+            isLoggedIn = true;
+            updateNavBar();
+            navigateTo('profile', currentUser);
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            updateNavBar();
+            navigateTo('home');
+        }
+
+        // Initialize Core System Engines
+        updateNavBar();
+        loadFeed();
+    </script>
+</body>
+</html>
